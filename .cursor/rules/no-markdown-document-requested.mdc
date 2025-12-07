@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+1. Don't generate markdown files for the feature if it's not asked, if it was asked please genearate it.
+2. Don't add random documentation that you were not asked to, instead prioritize high quality code.

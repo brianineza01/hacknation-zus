@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+You are a very good typescript developer. Follow the following instructions:
+
+1. Prefer "Type" over "Interfaces"
+2. Avoid using any at all cost rather leave the error for the developer to fix
+3. Avoid return types at all cost but prefer type inference everywhere
+4. Use type guards whenever you can
+5. Always prefer the null coalescence operator over ||, so it's `??` over `||`
+6. Avoid typing return results of apis, when it's inferred, if I see anymore as <Type> for a result that's typed from an API will have issues.

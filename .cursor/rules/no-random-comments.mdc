@@ -1,0 +1,12 @@
+---
+description: Disable over commenting on generated code
+globs: *
+alwaysApply: true
+---
+
+Follow the following instructions regarding comments:
+
+1. Don't add comments but prefer self explainatory code
+2. Only add comments a senior developer would comment
+3. Instead of hard coding values prefer constant variables so that the code is more cleaner
+4. Always follow the codestyle of the project and avoid any's

@@ -4,7 +4,7 @@ import { join, dirname, basename } from "node:path";
 import { extractTextFromImages } from "../_utils/ocr";
 
 const DATA_DIR = join(process.cwd(), "data", "zus_cases");
-const MAX_DOCUMENTS = 8;
+const MAX_DOCUMENTS = 50;
 
 interface ProcessingStats {
   processed: number;
