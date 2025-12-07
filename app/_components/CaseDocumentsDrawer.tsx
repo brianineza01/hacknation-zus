@@ -1,13 +1,20 @@
-"use client"
+"use client";
 
-import { Sheet, SheetHeader, SheetTitle, SheetClose, SheetContent } from "@/components/ui/sheet"
-import type { CaseWithDocuments } from "@/app/_types/case"
+import {
+  Sheet,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+  SheetContent,
+} from "@/components/ui/sheet";
+import { CaseAnalysisReport } from "./CaseAnalysisReport";
+import type { CaseWithDocuments } from "@/app/_types/case";
 
 type CaseDocumentsDrawerProps = {
-  case: CaseWithDocuments | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+  case: CaseWithDocuments | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
 
 const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   karta_wypadku: "Karta Wypadku",
@@ -15,33 +22,42 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   wyjasnienia_poszkodowanego: "Wyjaśnienia Poszkodowanego",
   zawiadomienie_o_wypadku: "Zawiadomienie o Wypadku",
   other: "Other",
-}
+};
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
   processing: "Processing",
   completed: "Completed",
   failed: "Failed",
-}
+};
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  processing: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  pending:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  processing:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  completed:
+    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-}
+};
 
-export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: CaseDocumentsDrawerProps) {
-  if (!caseData) return null
+export function CaseDocumentsDrawer({
+  case: caseData,
+  open,
+  onOpenChange,
+}: CaseDocumentsDrawerProps) {
+  if (!caseData) return null;
 
-  const documentsByType = caseData.documents.reduce<Record<string, typeof caseData.documents>>((acc, doc) => {
-    const type = doc.type ?? "other"
+  const documentsByType = caseData.documents.reduce<
+    Record<string, typeof caseData.documents>
+  >((acc, doc) => {
+    const type = doc.type ?? "other";
     if (!acc[type]) {
-      acc[type] = []
+      acc[type] = [];
     }
-    acc[type].push(doc)
-    return acc
-  }, {})
+    acc[type].push(doc);
+    return acc;
+  }, {});
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -50,8 +66,8 @@ export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: Case
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -59,7 +75,7 @@ export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: Case
         <SheetTitle>{caseData.name}</SheetTitle>
         <SheetClose onClick={() => onOpenChange(false)} />
       </SheetHeader>
-      
+
       <SheetContent>
         <div className="space-y-6">
           {caseData.description && (
@@ -75,9 +91,16 @@ export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: Case
 
           <div>
             <h3 className="mb-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+              AI Analysis Report
+            </h3>
+            <CaseAnalysisReport caseId={caseData.id} />
+          </div>
+
+          <div>
+            <h3 className="mb-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
               Documents ({caseData.documents.length})
             </h3>
-            
+
             {caseData.documents.length === 0 ? (
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 No documents uploaded yet.
@@ -112,7 +135,7 @@ export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: Case
                               {STATUS_LABELS[doc.status ?? "pending"]}
                             </span>
                           </div>
-                          
+
                           {doc.fileUrl && (
                             <a
                               href={doc.fileUrl}
@@ -150,15 +173,15 @@ export function CaseDocumentsDrawer({ case: caseData, open, onOpenChange }: Case
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Case created: {formatDate(caseData.createdAt)}
             </p>
-            {caseData.updatedAt && caseData.updatedAt !== caseData.createdAt && (
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                Last updated: {formatDate(caseData.updatedAt)}
-              </p>
-            )}
+            {caseData.updatedAt &&
+              caseData.updatedAt !== caseData.createdAt && (
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  Last updated: {formatDate(caseData.updatedAt)}
+                </p>
+              )}
           </div>
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
-

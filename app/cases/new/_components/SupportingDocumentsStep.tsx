@@ -1,120 +1,137 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useUploadThing } from "@/app/_utils/uploadthing"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import type { SupportingDocumentType, UploadedDocument } from "@/app/_types/case"
+import { useState } from "react";
+import { useUploadThing } from "@/app/_utils/uploadthing";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import type {
+  SupportingDocumentType,
+  UploadedDocument,
+} from "@/app/_types/case";
 
 type SupportingDocumentsStepProps = {
-  uploadedDocuments: UploadedDocument[]
-  onUploadComplete: (document: UploadedDocument) => void
-  onRemoveDocument: (key: string) => void
-}
+  uploadedDocuments: UploadedDocument[];
+  onUploadComplete: (document: UploadedDocument) => void;
+  onRemoveDocument: (key: string) => void;
+};
 
-const SUPPORTING_DOCUMENT_OPTIONS: { value: SupportingDocumentType; label: string; description: string }[] = [
-  { 
-    value: "proof_of_business", 
-    label: "Proof of Business Activity", 
-    description: "Contracts, invoices, service orders confirming business activity" 
+const SUPPORTING_DOCUMENT_OPTIONS: {
+  value: SupportingDocumentType;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "proof_of_business",
+    label: "Proof of Business Activity",
+    description:
+      "Contracts, invoices, service orders confirming business activity",
   },
-  { 
-    value: "authorization", 
-    label: "Authorization", 
-    description: "Copy of license or concession (if required for business)" 
+  {
+    value: "authorization",
+    label: "Authorization",
+    description: "Copy of license or concession (if required for business)",
   },
-  { 
-    value: "medical_records", 
-    label: "Medical Records", 
-    description: "Hospital information card or first aid documentation" 
+  {
+    value: "medical_records",
+    label: "Medical Records",
+    description: "Hospital information card or first aid documentation",
   },
-  { 
-    value: "traffic_police_note", 
-    label: "Traffic Police Note", 
-    description: "Official note for traffic accidents" 
+  {
+    value: "traffic_police_note",
+    label: "Traffic Police Note",
+    description: "Official note for traffic accidents",
   },
-  { 
-    value: "prosecutor_decision", 
-    label: "Prosecutor's Decision", 
-    description: "Decision on proceedings (initiation/suspension/dismissal)" 
+  {
+    value: "prosecutor_decision",
+    label: "Prosecutor's Decision",
+    description: "Decision on proceedings (initiation/suspension/dismissal)",
   },
-  { 
-    value: "power_of_attorney", 
-    label: "Power of Attorney", 
-    description: "Legal authorization (if applicable)" 
+  {
+    value: "power_of_attorney",
+    label: "Power of Attorney",
+    description: "Legal authorization (if applicable)",
   },
-  { 
-    value: "death_certificate", 
-    label: "Death Certificate", 
-    description: "Statistical death card or medical certificate (for fatal accidents)" 
+  {
+    value: "death_certificate",
+    label: "Death Certificate",
+    description:
+      "Statistical death card or medical certificate (for fatal accidents)",
   },
-  { 
-    value: "birth_marriage_certificate", 
-    label: "Birth/Marriage Certificate", 
-    description: "Condensed certificates (for fatal accidents)" 
+  {
+    value: "birth_marriage_certificate",
+    label: "Birth/Marriage Certificate",
+    description: "Condensed certificates (for fatal accidents)",
   },
-]
+];
 
 export function SupportingDocumentsStep({
   uploadedDocuments,
   onUploadComplete,
   onRemoveDocument,
 }: SupportingDocumentsStepProps) {
-  const [selectedDocumentType, setSelectedDocumentType] = useState<SupportingDocumentType>("proof_of_business")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
+  const [selectedDocumentType, setSelectedDocumentType] =
+    useState<SupportingDocumentType>("proof_of_business");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: (res) => {
-      setIsUploading(false)
+      setIsUploading(false);
       if (res && res.length > 0) {
-        const uploadedFile = res[0]
+        const uploadedFile = res[0];
         onUploadComplete({
           type: selectedDocumentType,
           name: uploadedFile.name,
           url: uploadedFile.url,
           key: uploadedFile.key,
           category: "supporting",
-        })
-        setSelectedFile(null)
+        });
+        setSelectedFile(null);
       }
     },
     onUploadError: (error: Error) => {
-      setIsUploading(false)
-      console.error("Upload error:", error)
-      alert(`Upload failed: ${error.message}`)
+      setIsUploading(false);
+      console.error("Upload error:", error);
+      alert(`Upload failed: ${error.message}`);
     },
-  })
+  });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file)
+      setSelectedFile(file);
     }
-  }
+  };
 
   const handleUpload = async () => {
-    if (!selectedFile) return
-    
-    setIsUploading(true)
-    await startUpload([selectedFile])
-  }
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+    await startUpload([selectedFile], {});
+  };
 
   const handleRemoveSelected = () => {
-    setSelectedFile(null)
-  }
+    setSelectedFile(null);
+  };
 
   const selectedOption = SUPPORTING_DOCUMENT_OPTIONS.find(
-    opt => opt.value === selectedDocumentType
-  )
+    (opt) => opt.value === selectedDocumentType
+  );
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Supporting Documents (Optional)</CardTitle>
         <CardDescription>
-          Upload supporting documents as evidence. You can upload multiple documents or skip this step entirely by clicking "Create Case" below.
+          Upload supporting documents as evidence. You can upload multiple
+          documents or skip this step entirely by clicking "Create Case" below.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -124,8 +141,8 @@ export function SupportingDocumentsStep({
             <div className="space-y-2">
               {uploadedDocuments.map((doc) => {
                 const docOption = SUPPORTING_DOCUMENT_OPTIONS.find(
-                  opt => opt.value === doc.type
-                )
+                  (opt) => opt.value === doc.type
+                );
                 return (
                   <div
                     key={doc.key}
@@ -146,7 +163,7 @@ export function SupportingDocumentsStep({
                       Remove
                     </Button>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -159,7 +176,11 @@ export function SupportingDocumentsStep({
               id="document-type"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               value={selectedDocumentType}
-              onChange={(e) => setSelectedDocumentType(e.target.value as SupportingDocumentType)}
+              onChange={(e) =>
+                setSelectedDocumentType(
+                  e.target.value as SupportingDocumentType
+                )
+              }
               disabled={isUploading}
             >
               {SUPPORTING_DOCUMENT_OPTIONS.map((option) => (
@@ -231,6 +252,5 @@ export function SupportingDocumentsStep({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

@@ -99,3 +99,87 @@ export async function seedDocumentToPinecone(
     `Successfully seeded ${records.length} chunks to Pinecone index 'zus-notification-better' in namespace '${namespace}'`
   );
 }
+
+export type SimilarCaseMatch = {
+  caseId: string;
+  templateId: string;
+  score: number;
+  text: string;
+  extractedData?: string;
+};
+
+export async function searchSimilarCases(
+  queryText: string,
+  options?: {
+    topK?: number;
+    namespace?: string;
+    minScore?: number;
+    excludeCaseId?: string;
+  }
+): Promise<SimilarCaseMatch[]> {
+  if (!process.env.PINECONE_API_KEY) {
+    throw new Error("PINECONE_API_KEY environment variable is not set");
+  }
+
+  const pinecone = new Pinecone({
+    apiKey: process.env.PINECONE_API_KEY,
+  });
+
+  const index = pinecone.index("zus-notification-better");
+  const namespace = options?.namespace ?? DEFAULT_NAMESPACE;
+  const topK = options?.topK ?? 10;
+  const minScore = options?.minScore ?? 0.7;
+
+  const namespaceIndex = index.namespace(namespace);
+
+  const searchResponse = await namespaceIndex.searchRecords({
+    query: {
+      inputs: { text: queryText },
+      topK,
+    },
+  });
+
+  const matches: SimilarCaseMatch[] = [];
+
+  for (const hit of searchResponse.result.hits) {
+    const score = hit._score ?? 0;
+
+    if (score < minScore) {
+      continue;
+    }
+
+    const fields = hit.fields ?? {};
+    const caseId = (fields as { caseId: string }).caseId;
+    const templateId = (fields as { templateId: string }).templateId;
+
+    if (options?.excludeCaseId && caseId === options.excludeCaseId) {
+      continue;
+    }
+
+    matches.push({
+      caseId,
+      templateId,
+      score,
+      text: (fields as { text: string }).text ?? "",
+      extractedData:
+        (fields as { extractedData: string }).extractedData ?? undefined,
+    });
+  }
+
+  const groupedByCaseId = new Map<string, SimilarCaseMatch[]>();
+  for (const match of matches) {
+    const existing = groupedByCaseId.get(match.caseId) ?? [];
+    existing.push(match);
+    groupedByCaseId.set(match.caseId, existing);
+  }
+
+  const topMatches: SimilarCaseMatch[] = [];
+  for (const [, caseMatches] of groupedByCaseId) {
+    caseMatches.sort((a, b) => b.score - a.score);
+    topMatches.push(caseMatches[0]);
+  }
+
+  topMatches.sort((a, b) => b.score - a.score);
+
+  return topMatches.slice(0, topK);
+}

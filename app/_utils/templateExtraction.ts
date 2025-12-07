@@ -74,7 +74,7 @@ function buildMinimalTemplateStructure(template: Template): {
 }
 
 /**
- * Extracts structured data from OCR text based on a template schema using Gemini 2.5 Flash
+ * Extracts structured data from OCR text based on a template schema using Gemini 2.0 Flash
  *
  * @param text - The OCR extracted text to extract data from
  * @param templateId - The template ID (can be id_pl or id_en)
@@ -141,7 +141,7 @@ ${truncatedText}
 
   try {
     const result = await generateObject({
-      model: openrouter.chat("google/gemini-2.5-flash-preview-09-2025"),
+      model: openrouter.chat("google/gemini-3-pro-preview"),
       schema,
       messages: [
         {

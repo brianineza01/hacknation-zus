@@ -29,7 +29,7 @@ async function imageToBase64DataUrl(imagePath: string): Promise<string> {
 }
 
 /**
- * Extracts text from an array of images using Gemini 2.5 Pro via OpenRouter
+ * Extracts text from an array of images using google/gemini-3-pro-preview via OpenRouter
  *
  * @param imagePaths - Array of file paths to images
  * @returns Extracted text content from all images
@@ -70,9 +70,8 @@ export async function extractTextFromImages(
     })),
   ];
 
-  // Call Gemini 2.5 Pro via OpenRouter
   const result = await generateText({
-    model: openrouter.chat("google/gemini-2.5-flash-preview-09-2025"),
+    model: openrouter.chat("google/gemini-3-pro-preview"),
     messages: [
       {
         role: "user",
