@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ["pdf-to-img", "@pinecone-database/pinecone"],
+  serverExternalPackages: ["@pinecone-database/pinecone"],
 } satisfies NextConfig;
 
 export default nextConfig;
